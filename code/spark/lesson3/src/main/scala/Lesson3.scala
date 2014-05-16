@@ -5,21 +5,26 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
 object Lesson3 {
+
   def main(args: Array[String]) {
     val purchasesFile = "/home/training/udacity_training/data/purchases.txt"
     val sc = new SparkContext("local", "Purchases", "/home/training/spark-0.9.1-bin-hadoop1/",
       List("target/scala-2.10/lesson-3_2.10-1.0.jar"))
 
-    val purchasesData = sc.textFile(purchasesFile)//.sample(false, 0.01, 1)
+    val purchasesData = sc.textFile(purchasesFile) //.sample(false, 0.01, 1)
 
     val toysAndElectronicsSales = computeTotalSalesForToysAndElectronics(purchasesData)
     val highestSalesPerStore = computeHighestSaleForSelectedStores(purchasesData)
+    val totalSales = computeTotalSales(purchasesData)
 
     println("Total sales for Toys and Consumer Electronics:")
     toysAndElectronicsSales.foreach(println)
 
     println("Highest sales for selected stores:")
     highestSalesPerStore.foreach(println)
+
+    println("Total sales:")
+    totalSales.foreach(println)
   }
 
   def computeTotalSalesForToysAndElectronics(rawData: RDD[String]): Array[(String, BigDecimal)] = {
@@ -34,10 +39,20 @@ object Lesson3 {
   def computeHighestSaleForSelectedStores(rawData: RDD[String]): Array[(String, BigDecimal)] = {
     rawData
       .map(line => line.split("\t"))
-      .map(line => (line(2),BigDecimal(line(4))))
-      .reduceByKey((a: BigDecimal, b: BigDecimal) => if (a>b) a else b)
-      .filter((t: (String, BigDecimal)) => "Reno"==t._1 || "Toledo"==t._1 || "Chandler"==t._1)
+      .map(line => (line(2), BigDecimal(line(4))))
+      .reduceByKey((a: BigDecimal, b: BigDecimal) => if (a > b) a else b)
+      .filter((t: (String, BigDecimal)) => "Reno" == t._1 || "Toledo" == t._1 || "Chandler" == t._1)
       .collect()
   }
+
+  def computeTotalSales(rawData: RDD[String]): Array[(String, BigDecimal)] = {
+    val numberOfSales = BigDecimal(rawData.count())
+    val totalSalesVal = rawData
+      .map(line => line.split("\t"))
+      .map(line => (BigDecimal(line(4))))
+      .reduce((a, b) => a + b)
+    Array(("Number of sales", numberOfSales), ("Total value of sales", totalSalesVal))
+  }
+
 }
 
