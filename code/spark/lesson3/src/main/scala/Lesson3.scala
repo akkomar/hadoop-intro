@@ -14,15 +14,16 @@ object Lesson3 {
 
     val toysAndElectronicsSales = computeTotalSalesForToysAndElectronics(purchasesData)
     println("Total sales for Toys and Consumer Electronics:")
-    println(toysAndElectronicsSales.collect().deep)
+    toysAndElectronicsSales.foreach(println)
   }
 
-  def computeTotalSalesForToysAndElectronics(rawData: RDD[String]): RDD[(String, BigDecimal)] = {
+  def computeTotalSalesForToysAndElectronics(rawData: RDD[String]): Array[(String, BigDecimal)] = {
     rawData
       .map(line => line.split("\t"))
       .filter(purchase => "Toys" == purchase(3) || "Consumer Electronics" == purchase(3))
       .map(purchase => (purchase(3), scala.math.BigDecimal(purchase(4))))
       .reduceByKey((a: BigDecimal, b: BigDecimal) => a + b)
+      .collect()
   }
 }
 
