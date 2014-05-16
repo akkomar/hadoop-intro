@@ -7,6 +7,29 @@ import org.apache.spark.SparkContext._
 object Lesson3 {
 
   def main(args: Array[String]) {
+    solvePart1
+    solvePart2
+  }
+
+  def solvePart2 = {
+    val accessLogFile = "/home/training/udacity_training/data/access_log"
+    val sc = new SparkContext("local", "Access Log", "/home/training/spark-0.9.1-bin-hadoop1/",
+      List("target/scala-2.10/lesson-3_2.10-1.0.jar"))
+    val accessLog = sc.textFile(accessLogFile)
+
+    val numOfHits = accessLog.filter(_.contains("\"GET /assets/js/the-associates.js")).count()
+    val ipHits = accessLog.filter(_.startsWith("10.99.99.186")).count()
+
+    println("Number of hits to 'the-associates.js':")
+    println(numOfHits)
+
+    println("Number of hits by IP: 10.99.99.186:")
+    println(ipHits)
+
+
+  }
+
+  def solvePart1 = {
     val purchasesFile = "/home/training/udacity_training/data/purchases.txt"
     val sc = new SparkContext("local", "Purchases", "/home/training/spark-0.9.1-bin-hadoop1/",
       List("target/scala-2.10/lesson-3_2.10-1.0.jar"))
