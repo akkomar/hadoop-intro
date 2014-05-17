@@ -8,7 +8,7 @@ object Lesson3 {
 
   def main(args: Array[String]) {
     solvePart1
-    solvePart2
+    //    solvePart2
   }
 
   def solvePart2 = {
@@ -19,6 +19,7 @@ object Lesson3 {
 
     val numOfHits = accessLog.filter(_.contains("\"GET /assets/js/the-associates.js")).count()
     val ipHits = accessLog.filter(_.startsWith("10.99.99.186")).count()
+    val mostPopFile = accessLog.map(_.split(" ")).map(x => (x(6), 1)).reduceByKey((a, b) => a + b).top(1)(Ordering.by(_._2))
 
     println("Number of hits to 'the-associates.js':")
     println(numOfHits)
@@ -26,7 +27,8 @@ object Lesson3 {
     println("Number of hits by IP: 10.99.99.186:")
     println(ipHits)
 
-
+    println("Most popular file:")
+    println(mostPopFile)
   }
 
   def solvePart1 = {
